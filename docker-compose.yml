@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: db_container
+    restart: always
+    hostname: localhost 
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql_14/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: discord_clone
+      POSTGRES_INITDB_ARGS: --auth=scram-sha-256
+    networks:
+      - network
+  back:
+    container_name: back_container
+    image: back_prod_image:1.0
+    restart: unless-stopped
+    environment:
+      DATABASE_HOST: postgres
+    build: 
+      context: back
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    networks:
+      - network
+    depends_on:
+      - postgres
+  front:
+    container_name: front_container
+    image: front_prod_image:1.0
+    restart: unless-stopped
+    build: 
+      context: front
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - network
+    depends_on:
+      - back
+
+networks:
+  network:
