@@ -27,7 +27,7 @@ services:
       context: back
       dockerfile: Dockerfile
     ports:
-      - 8000:8000
+      - 9200:9200
     networks:
       - network
     depends_on:
